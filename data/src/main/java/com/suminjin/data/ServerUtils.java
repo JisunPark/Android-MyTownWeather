@@ -86,7 +86,7 @@ public class ServerUtils {
             e.printStackTrace();
             response = "IOException ] " + e.toString();
         }
-        Log.e(Config.TAG, response);
+        Log.e(AppConfig.TAG, response);
 
         return response;
     }
@@ -126,17 +126,17 @@ public class ServerUtils {
                 sslContext = getTrustedSSLContext(caInput);
             }
         } catch (NoSuchAlgorithmException e) {
-            Log.e(Config.TAG, "NoSuchAlgorithmException] " + e.toString());
+            Log.e(AppConfig.TAG, "NoSuchAlgorithmException] " + e.toString());
         } catch (KeyManagementException e) {
-            Log.e(Config.TAG, "KeyManagementException] " + e.toString());
+            Log.e(AppConfig.TAG, "KeyManagementException] " + e.toString());
         } catch (CertificateException e) {
-            Log.e(Config.TAG, "CertificateException] " + e.toString());
+            Log.e(AppConfig.TAG, "CertificateException] " + e.toString());
         } catch (UnrecoverableKeyException e) {
-            Log.e(Config.TAG, "UnrecoverableKeyException] " + e.toString());
+            Log.e(AppConfig.TAG, "UnrecoverableKeyException] " + e.toString());
         } catch (KeyStoreException e) {
-            Log.e(Config.TAG, "KeyStoreException] " + e.toString());
+            Log.e(AppConfig.TAG, "KeyStoreException] " + e.toString());
         } catch (IOException e) {
-            Log.e(Config.TAG, "IOException] " + e.toString());
+            Log.e(AppConfig.TAG, "IOException] " + e.toString());
         }
         return sslContext;
     }

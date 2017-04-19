@@ -2,7 +2,6 @@ package com.suminjin.mytownweather;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,8 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suminjin.data.ApiType;
-import com.suminjin.data.Config;
+import com.suminjin.data.AppConfig;
 import com.suminjin.data.DataCode;
+import com.suminjin.data.DataCodeBuilder;
 import com.suminjin.data.Field;
 import com.suminjin.data.ServerConfig;
 import com.suminjin.data.ServerUtils;
@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
      * @param apiType
      * @param responseStr
      * @return
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         JSONObject obj = (JSONObject) itemArray.get(i);
                         String category = obj.getString(Field.CATEGORY.name);
                         DataCode dataCode = getDataCode(category);
-                        sb.append("[").append(String.format("%02d", i + 1)).append(" ").append(category).append("] ");
+                        sb.append("[").append(category).append("] ");
                         switch (apiType) {
                             case FORECAST_GRIB:
                                 String obsrValue = obj.getString(Field.OBSR_VALUE.name);
@@ -116,8 +115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     sb.append(category).append(" : ").append(obsrValue).append("\n");
                                 } else {
                                     sb.append(dataCode.dataName).append(" : ")
-                                            .append(getDataValue(apiType, dataCode, obsrValue))
-                                            .append(" ").append(dataCode.unit).append("\n");
+                                            .append(DataCodeBuilder.getDataValue(apiType, dataCode, obsrValue)).append("\n");
                                 }
                                 break;
                             case FORECAST_TIME_DATA:
@@ -130,8 +128,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             .append(" : ").append(fcstValue).append("\n");
                                 } else {
                                     sb.append(dataCode.dataName).append("(").append(fcstTime).append(")").append(" : ")
-                                            .append(getDataValue(apiType, dataCode, fcstValue)).append(" ")
-                                            .append(dataCode.unit).append("\n");
+                                            .append(DataCodeBuilder.getDataValue(apiType, dataCode, fcstValue)).append("\n");
                                 }
                                 break;
                             default:
@@ -146,69 +143,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 sb.append(resultMsg);
             }
         } catch (JSONException e) {
-            Log.e(Config.TAG, "JSONException] " + e.toString());
+            Log.e(AppConfig.TAG, "JSONException] " + e.toString());
         }
         return sb.toString();
-    }
-
-    /**
-     * @param valueStr
-     * @param valueArray
-     * @return
-     */
-    private String getValidValueCode(String valueStr, String[] valueArray) {
-        String result = valueStr;
-        int val = Integer.parseInt(valueStr);
-        if (val >= 0 && val < valueArray.length) {
-            result = ServerConfig.skyCodes[Integer.parseInt(valueStr)];
-        }
-        return result;
-    }
-
-    /**
-     * data code에 따라 값을 표시
-     *
-     * @param apiType
-     * @param dataCode
-     * @param valueStr
-     * @return
-     */
-    private String getDataValue(ApiType apiType, DataCode dataCode, String valueStr) {
-        String result = valueStr;
-        if (dataCode.equals(DataCode.SKY)) {
-            int val = Integer.parseInt(valueStr);
-            // sky code는 1~4
-            if (val > 0 && val <= ServerConfig.skyCodes.length) {
-                result = ServerConfig.skyCodes[Integer.parseInt(valueStr) - 1];
-            }
-        } else if (dataCode.equals(DataCode.PTY)) {
-            result = getValidValueCode(valueStr, ServerConfig.ptyCodes);
-        } else if (dataCode.equals(DataCode.RN1) || dataCode.equals(DataCode.R06)) {
-
-        } else if (dataCode.equals(DataCode.S06)) {
-
-        } else if (dataCode.equals(DataCode.LGT)) {
-            if (apiType.equals(ApiType.FORECAST_GRIB)) { // 초단기 실황
-                result = getValidValueCode(valueStr, ServerConfig.gribLgtCodes);
-            } else { // 초단기 예보
-                result = getValidValueCode(valueStr, ServerConfig.timeLgtCodes);
-            }
-        } else if (dataCode.equals(DataCode.UUU)) {
-            float value = Float.parseFloat(valueStr);
-            if (value > 0) {
-                result = "동 " + Math.abs(value);
-            } else if (value < 0) {
-                result = "서 " + Math.abs(value);
-            }
-        } else if (dataCode.equals(DataCode.VVV)) {
-            float value = Float.parseFloat(valueStr);
-            if (value > 0) {
-                result = "북 " + Math.abs(value);
-            } else if (value < 0) {
-                result = "남 " + Math.abs(value);
-            }
-        }
-        return result;
     }
 
     /**

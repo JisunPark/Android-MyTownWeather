@@ -2,7 +2,6 @@ package com.suminjin.data;
 
 import android.content.Context;
 import android.net.Uri;
-import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -38,10 +37,6 @@ public class ServerConfig {
     private static String serviceKey = null;
 
     public static String[] validSpaceBaseTime = new String[]{"0200", "0500", "0800", "1100", "1400", "1700", "2000", "2300"};
-    public static String[] skyCodes = new String[]{"맑음", "구름조금", "구름많음", "흐림"};
-    public static String[] ptyCodes = new String[]{"없음", "비", "비/눈", "눈"};
-    public static String[] gribLgtCodes = new String[]{"없음", "있음"};
-    public static String[] timeLgtCodes = new String[]{"확률없음", "낮음", "보통", "높음"};
 
     /**
      * api 종류에 따른 url 가져오기
@@ -147,9 +142,9 @@ public class ServerConfig {
 //            try {
 //                serviceKey = URLEncoder.encode(context.getString(R.string.service_key), DEFAULT_CHARSET);
 //            } catch (UnsupportedEncodingException e) {
-//                Log.d(Config.TAG, "UnsupportedEncodingException] " + e.toString());
+//                Log.d(AppConfig.TAG, "UnsupportedEncodingException] " + e.toString());
 //            }
-//            Log.e(Config.TAG, "Encoded serviceKey] " + serviceKey);
+//            Log.e(AppConfig.TAG, "Encoded serviceKey] " + serviceKey);
 
             try {
                 serviceKey = URLDecoder.decode(context.getString(R.string.service_key), DEFAULT_CHARSET);
