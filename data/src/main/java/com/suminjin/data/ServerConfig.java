@@ -2,6 +2,7 @@ package com.suminjin.data;
 
 import android.content.Context;
 import android.net.Uri;
+import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -30,7 +31,7 @@ public class ServerConfig {
     private static final String TYPE_JSON = "json";
     private static final String DEFAULT_CHARSET = "UTF-8";
     private static final int DEFAULT_PAGE = 1; // 1 page부터 시작
-    private static final int DEFAULT_NUM_OF_ROWS = 50;
+    private static final int DEFAULT_NUM_OF_ROWS = 100;
 
     public static final String VALID_RESULT_CODE = "0000";
 
@@ -52,18 +53,43 @@ public class ServerConfig {
      * @return
      */
     public static String getUrl(Context context, ApiType apiType, int nx, int ny) {
-        String baseDate, baseTime;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HHmm", Locale.getDefault());
+        String[] temp = sdf.format(new Date()).split(" ");
+        String baseDate = temp[0];
+        String baseTime = temp[1];
 
-        if (apiType == ApiType.FORECAST_SPACE_DATA) {
+        if (apiType == ApiType.FORECAST_GRIB) {
+            // 초단기실황은 정각에서 40분이후에 api 제공
+            int baseTimeValue = Integer.parseInt(baseTime);
+            int hour = baseTimeValue / 100; // 앞쪽 두 자리가 시간
+            if ((baseTimeValue % 100) < 40) {
+                // 40분이전이면 1시간 전의 정보를
+                if (hour > 0) {
+                    --hour;
+                } else {
+                    // TODO jisun : 0시 이전에는, 전날의 마지막 정보를 이용해야 하지만 일단 보류
+                }
+            }
+            baseTime = String.format("%02d00", hour);
+        } else if (apiType == ApiType.FORECAST_TIME_DATA) {
+            // 초단기예보는 45분 이후 api 제공
+            int baseTimeValue = Integer.parseInt(baseTime);
+            int hour = baseTimeValue / 100; // 앞쪽 두 자리가 시간
+            if ((baseTimeValue % 100) < 45) {
+                // 40분이전이면 1시간 전의 정보를
+                if (hour > 0) {
+                    --hour;
+                } else {
+                    // TODO jisun : 0시 이전에는, 전날의 마지막 정보를 이용해야 하지만 일단 보류
+                }
+            }
+            baseTime = String.format("%02d00", hour);
+        } else if (apiType == ApiType.FORECAST_SPACE_DATA) {
             // 동네예보조회는 특정 시간값으로만 조회 가능함
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HHmm", Locale.getDefault());
-            String[] temp = sdf.format(new Date()).split(" ");
-            baseDate = temp[0];
-            baseTime = temp[1];
             String result = null;
             int baseTimeValue = Integer.parseInt(baseTime);
             for (String t : validSpaceBaseTime) {
-                int tValue = Integer.parseInt(t) + 10; // 10분 이후에 api 제공
+                int tValue = Integer.parseInt(t) + 10; // 특정 시간의 10분 이후에 api 제공
                 if (baseTimeValue > tValue) {
                     result = t;
                 } else {
@@ -73,13 +99,8 @@ public class ServerConfig {
             if (result != null) {
                 baseTime = result;
             }
-        } else {
-            // 단기조회시 분값은 00으로
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH00", Locale.getDefault());
-            String[] temp = sdf.format(new Date()).split(" ");
-            baseDate = temp[0];
-            baseTime = temp[1];
         }
+        android.util.Log.e("jisunLog", apiType.name() + " 호출 시간 ] " + baseDate + " " + baseTime);
         return buildUrl(context, apiType.path, baseDate, baseTime, nx, ny, DEFAULT_PAGE, DEFAULT_NUM_OF_ROWS);
     }
 

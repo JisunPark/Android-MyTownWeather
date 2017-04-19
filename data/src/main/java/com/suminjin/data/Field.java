@@ -15,7 +15,9 @@ public enum Field {
     OBSR_VALUE("obsrValue"),
     FCST_TIME("fcstTime"),
     FCST_VALUE("fcstValue"),
-    TOTAL_COUNT("totalCount");
+    TOTAL_COUNT("totalCount"),
+    BASE_DATE("baseDate"),
+    BASE_TIME("baseTime");
 
     public String name;
 

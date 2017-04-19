@@ -2,9 +2,20 @@ package com.suminjin.mytownweather;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -30,13 +41,14 @@ import java.util.Locale;
  * Created by parkjisun on 2017. 4. 17..
  */
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String INTENT_EXTRA_X = "intent_extra_x";
     public static final String INTENT_EXTRA_Y = "intent_extra_y";
 
     private TextView textViewResponse;
     private ScrollView scrollView;
+    private DrawerLayout drawer;
 
     int x, y;
 
@@ -44,6 +56,20 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+//        setCustomActionBar(); // FIXME jisun-test
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         x = getIntent().getIntExtra(INTENT_EXTRA_X, 0);
         y = getIntent().getIntExtra(INTENT_EXTRA_Y, 0);
@@ -56,6 +82,12 @@ public class MainActivity extends FragmentActivity {
         setForecastData(ApiType.FORECAST_GRIB);
     }
 
+    /**
+     *
+     * @param apiType
+     * @param responseStr
+     * @return
+     */
     private String parseResponse(ApiType apiType, String responseStr) {
         StringBuilder sb = new StringBuilder();
 
@@ -76,7 +108,6 @@ public class MainActivity extends FragmentActivity {
                         JSONObject obj = (JSONObject) itemArray.get(i);
                         String category = obj.getString(Field.CATEGORY.name);
                         DataCode dataCode = getDataCode(category);
-
                         sb.append("[").append(String.format("%02d", i + 1)).append(" ").append(category).append("] ");
                         switch (apiType) {
                             case FORECAST_GRIB:
@@ -121,7 +152,6 @@ public class MainActivity extends FragmentActivity {
     }
 
     /**
-     *
      * @param valueStr
      * @param valueArray
      * @return
@@ -262,5 +292,97 @@ public class MainActivity extends FragmentActivity {
         }.execute(url);
     }
 
+    /**
+     *
+     */
+    private void setCustomActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayShowHomeEnabled(false);
+
+        // set custom view layout
+        View customView = LayoutInflater.from(this).inflate(R.layout.layout_action_bar, null);
+        actionBar.setCustomView(customView);
+
+        // set no padding both side
+        Toolbar parent = (Toolbar) customView.getParent();
+        parent.setContentInsetsAbsolute(0, 0);
+
+        // set action bar background image
+//        actionBar.setBackgroundDrawable(new ColorDrawable(Color.rgb(0xea, 0xbd, 0x00)));
+
+        // set action bar layout params
+        ActionBar.LayoutParams p = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT);
+        actionBar.setCustomView(customView, p);
+    }
+
+    public void onClickMenu(View v) {
+        drawer.openDrawer(Gravity.START);
+    }
+
+    public void onClickAdd(View v) {
+        // TODO jisun : search wifi-direct devices
+        Toast.makeText(this, "search wifi-direct devices", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 }
 

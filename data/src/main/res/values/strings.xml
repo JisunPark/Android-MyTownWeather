@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">(신)동네예보정보조회서비스</string>
     <string name="forecast_grib">초단기실황조회</string>
     <string name="forecast_time_data">초단기예보조회</string>
     <string name="forecast_space_data">동네예보조회</string>
