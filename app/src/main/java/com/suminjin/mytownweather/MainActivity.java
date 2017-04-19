@@ -1,16 +1,15 @@
 package com.suminjin.mytownweather;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,21 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suminjin.data.ApiType;
-import com.suminjin.data.AppConfig;
-import com.suminjin.data.DataCode;
-import com.suminjin.data.DataCodeBuilder;
-import com.suminjin.data.Field;
-import com.suminjin.data.ServerConfig;
-import com.suminjin.data.ServerUtils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.ArrayList;
 
 /**
  * Created by parkjisun on 2017. 4. 17..
@@ -49,8 +35,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView textViewResponse;
     private ScrollView scrollView;
     private DrawerLayout drawer;
+    private View selectedTopButton;
 
     int x, y;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,159 +62,65 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         x = getIntent().getIntExtra(INTENT_EXTRA_X, 0);
         y = getIntent().getIntExtra(INTENT_EXTRA_Y, 0);
 
-        textViewResponse = (TextView) findViewById(R.id.textViewResponse);
-        textViewResponse.setText("");
+        final ArrayList<View> topButtonList = new ArrayList<>();
+        topButtonList.add(findViewById(R.id.btnForecastGrib));
+        topButtonList.add(findViewById(R.id.btnForecastTimeData));
+        topButtonList.add(findViewById(R.id.btnForecastSpaceData));
 
-        scrollView = (ScrollView) findViewById(R.id.scrollView);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-        setForecastData(ApiType.FORECAST_GRIB);
-    }
-
-    /**
-     * @param apiType
-     * @param responseStr
-     * @return
-     */
-    private String parseResponse(ApiType apiType, String responseStr) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            JSONObject jsonObject = new JSONObject(responseStr);
-            JSONObject response = jsonObject.getJSONObject(Field.RESPONSE.name);
-            JSONObject header = response.getJSONObject(Field.HEADER.name);
-            String resultCode = header.getString(Field.RESULT_CODE.name);
-
-            if (resultCode != null && resultCode.equals(ServerConfig.VALID_RESULT_CODE)) {
-                JSONObject body = response.getJSONObject(Field.BODY.name);
-                String totalCount = body.getString(Field.TOTAL_COUNT.name);
-                if (totalCount != null && Integer.parseInt(totalCount) > 0) {
-                    JSONObject items = body.getJSONObject(Field.ITEMS.name);
-                    JSONArray itemArray = items.getJSONArray(Field.ITEM.name);
-
-                    for (int i = 0; i < itemArray.length(); i++) {
-                        JSONObject obj = (JSONObject) itemArray.get(i);
-                        String category = obj.getString(Field.CATEGORY.name);
-                        DataCode dataCode = getDataCode(category);
-                        sb.append("[").append(category).append("] ");
-                        switch (apiType) {
-                            case FORECAST_GRIB:
-                                String obsrValue = obj.getString(Field.OBSR_VALUE.name);
-                                if (dataCode == null) {
-                                    sb.append(category).append(" : ").append(obsrValue).append("\n");
-                                } else {
-                                    sb.append(dataCode.dataName).append(" : ")
-                                            .append(DataCodeBuilder.getDataValue(apiType, dataCode, obsrValue)).append("\n");
-                                }
-                                break;
-                            case FORECAST_TIME_DATA:
-                            case FORECAST_SPACE_DATA:
-                                String fcstTime = getFormattedTimeString(obj.getString(Field.FCST_TIME.name));
-                                String fcstValue = obj.getString(Field.FCST_VALUE.name);
-                                if (dataCode == null) {
-                                    sb.append(category)
-                                            .append("(").append(fcstTime).append(")")
-                                            .append(" : ").append(fcstValue).append("\n");
-                                } else {
-                                    sb.append(dataCode.dataName).append("(").append(fcstTime).append(")").append(" : ")
-                                            .append(DataCodeBuilder.getDataValue(apiType, dataCode, fcstValue)).append("\n");
-                                }
-                                break;
-                            default:
-                        }
-                    }
-                } else {
-                    sb.append("no item");
-                }
-            } else {
-                String resultMsg = header.getString(Field.RESULT_MSG.name);
-                Toast.makeText(this, resultMsg, Toast.LENGTH_SHORT).show();
-                sb.append(resultMsg);
             }
-        } catch (JSONException e) {
-            Log.e(AppConfig.TAG, "JSONException] " + e.toString());
-        }
-        return sb.toString();
+
+            @Override
+            public void onPageSelected(int position) {
+                setSelectedTopButton(topButtonList.get(position));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        viewPager.setAdapter(new ForecastViewPagerAdapter(getSupportFragmentManager(), x, y));
+        viewPager.setOffscreenPageLimit(ApiType.MAX.ordinal());
+        onClickTopButton(findViewById(R.id.btnForecastGrib));
     }
 
+
     /**
-     * 시간
+     * 상단 버튼 처리
      *
-     * @param dateStr
-     * @return
+     * @param v
      */
-    private String getFormattedTimeString(String dateStr) {
-        String result = dateStr;
-        SimpleDateFormat sdf = new SimpleDateFormat("HHmm", Locale.getDefault());
-        SimpleDateFormat sdf2 = new SimpleDateFormat("a hh:mm", Locale.getDefault());
-        try {
-            Date date = sdf.parse(dateStr);
-            result = sdf2.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-    /**
-     * @param categoryCode
-     * @return
-     */
-    private DataCode getDataCode(String categoryCode) {
-        DataCode dataCode = null;
-        for (DataCode d : DataCode.values()) {
-            if (d.name().equalsIgnoreCase(categoryCode)) {
-                dataCode = d;
+    public void onClickTopButton(View v) {
+        switch (v.getId()) {
+            case R.id.btnForecastGrib:
+                viewPager.setCurrentItem(ApiType.FORECAST_GRIB.ordinal());
                 break;
-            }
+            case R.id.btnForecastTimeData:
+                viewPager.setCurrentItem(ApiType.FORECAST_TIME_DATA.ordinal());
+                break;
+            case R.id.btnForecastSpaceData:
+                viewPager.setCurrentItem(ApiType.FORECAST_SPACE_DATA.ordinal());
+                break;
+            default:
         }
-        return dataCode;
+
+        // 선택 버튼 상태 변경
+        setSelectedTopButton(v);
     }
 
-    public void onClickForecastGrib(View v) {
-        setForecastData(ApiType.FORECAST_GRIB);
-    }
-
-    public void onClickForecastTimeData(View v) {
-        setForecastData(ApiType.FORECAST_TIME_DATA);
-    }
-
-    public void onClickForecastSpaceData(View v) {
-        setForecastData(ApiType.FORECAST_SPACE_DATA);
-    }
-
-    /**
-     * api type별로 url 구성 후 데이타 요청
-     *
-     * @param apiType
-     */
-    private void setForecastData(final ApiType apiType) {
-        // TODO jisun : convert_xy.c 파일을 이용해 위도, 경도에서 nx, ny값을 구해야 한다.
-        // 국회의사당역 37.528375, 126.917907  59/126
-        String url = ServerConfig.getUrl(this, apiType, x, y);
-//        String url = ServerConfig.getUrl(this, apiType, 59, 126); // FIXME jisun-test x,y
-//        Log.e("jisunLog", url);
-        new AsyncTask<String, String, String>() {
-
-            @Override
-            protected String doInBackground(String... params) {
-                return ServerUtils.requestHttpGet(params[0], null);
+    private void setSelectedTopButton(View v) {
+        if (v != null) {
+            if (selectedTopButton != null) {
+                selectedTopButton.setSelected(false);
             }
-
-            @Override
-            protected void onPostExecute(String response) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("[").append(getString(apiType.nameResId)).append("]\n")
-                        .append(parseResponse(apiType, response));
-                textViewResponse.setText(sb.toString());
-                scrollView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        scrollView.scrollTo(0, 0);
-                    }
-                });
-                super.onPostExecute(response);
-            }
-        }.execute(url);
+            selectedTopButton = v;
+            v.setSelected(true);
+        }
     }
 
     /**

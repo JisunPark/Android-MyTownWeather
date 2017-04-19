@@ -1,14 +1,13 @@
 <resources>
 
-
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!--<item name="android:windowTranslucentStatus">true</item>-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <!--<item name="android:actionBarSize">50dp</item>-->
-        <!--<item name="actionBarSize">50dp</item>-->
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
+        <item name="android:actionBarSize">@dimen/action_bar_height</item>
+        <item name="actionBarSize">@dimen/action_bar_height</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -20,4 +19,16 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="TopButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/selector_bg_top_btn</item>
+        <item name="android:textColor">#888</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginTop">7dp</item>
+        <item name="android:layout_marginLeft">2dp</item>
+        <item name="android:layout_marginRight">2dp</item>
+    </style>
 </resources>

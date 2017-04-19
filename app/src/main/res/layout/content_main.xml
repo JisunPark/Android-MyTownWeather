@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDark"
     android:orientation="vertical">
 
-    <Button
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onClickForecastGrib"
-        android:text="@string/forecast_grib" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onClickForecastTimeData"
-        android:text="@string/forecast_time_data" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onClickForecastSpaceData"
-        android:text="@string/forecast_space_data" />
-
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="40dp"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/textViewResponse"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="17sp" />
-    </ScrollView>
+            android:id="@+id/btnForecastGrib"
+            style="@style/TopButton"
+            android:onClick="onClickTopButton"
+            android:text="@string/forecast_grib" />
+
+        <TextView
+            android:id="@+id/btnForecastTimeData"
+            style="@style/TopButton"
+            android:onClick="onClickTopButton"
+            android:text="@string/forecast_time_data" />
+
+        <TextView
+            android:id="@+id/btnForecastSpaceData"
+            style="@style/TopButton"
+            android:onClick="onClickTopButton"
+            android:text="@string/forecast_space_data" />
+    </LinearLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

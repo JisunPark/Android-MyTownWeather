@@ -32,7 +32,7 @@ public class DataCodeBuilder {
     private static String getRainfallString(int key) {
         if (rainfallData == null) {
             rainfallData = new HashMap<>();
-            rainfallData.put(0, "0mm 또는 없음");
+            rainfallData.put(0, "없음");
             rainfallData.put(1, "1mm 미만");
             rainfallData.put(5, "1~4mm");
             rainfallData.put(10, "5~9mm");
@@ -47,7 +47,7 @@ public class DataCodeBuilder {
     private static String getSnowString(int key) {
         if (snowData == null) {
             snowData = new HashMap<>();
-            snowData.put(0, "0cm 또는 없음");
+            snowData.put(0, "없음");
             snowData.put(1, "1cm 미만");
             snowData.put(5, "1~4cm");
             snowData.put(10, "5~9cm");
@@ -126,7 +126,7 @@ public class DataCodeBuilder {
                 break;
             case RN1:
             case R06:
-                result = getRainfallString(Integer.parseInt(valueStr));
+                result = getRainfallString((int) Float.parseFloat(valueStr));
                 break;
             case S06:
                 result = getSnowString(Integer.parseInt(valueStr));

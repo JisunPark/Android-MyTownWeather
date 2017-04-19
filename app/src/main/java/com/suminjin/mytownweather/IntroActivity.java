@@ -74,7 +74,7 @@ public class IntroActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText("converting...");
+        tv.setText("finding...");
     }
 
     @Override

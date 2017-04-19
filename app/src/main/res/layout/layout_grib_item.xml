@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/txtIndex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/txtCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/txtCodeString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#00f"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/txtDataString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ea0"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/txtData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp" />
+
+</LinearLayout>
