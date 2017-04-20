@@ -3,7 +3,7 @@
 #include "convert_grid.h"
 
 extern "C"
-JNIEXPORT jintArray JNICALL Java_com_suminjin_mytownweather_IntroActivity_convertLocation(
+JNIEXPORT jintArray JNICALL Java_com_suminjin_mytownweather_SettingActivity_convertLocation(
         JNIEnv *env,
         jobject /* this */, jdouble a, jdouble b) {
 

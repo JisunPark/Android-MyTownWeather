@@ -6,4 +6,8 @@
 
     <string name="action_settings">Settings</string>
 
+    <string name="seacrh_current_location">현위치 검색하기</string>
+    <string name="select_location">직접 지역 선택하기</string>
+    <string name="gps_confirm_msg">GPS가 꺼져 있습니다. 사용을 위해 설정으로 이동하시겠습니까?\n취소를 선택할 경우 네트워크만을 이용해 위치를 검색합니다.</string>
+
 </resources>

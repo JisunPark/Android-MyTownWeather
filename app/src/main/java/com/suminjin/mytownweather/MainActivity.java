@@ -1,5 +1,6 @@
 package com.suminjin.mytownweather;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -15,8 +16,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suminjin.data.ApiType;
@@ -31,9 +30,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static final String INTENT_EXTRA_X = "intent_extra_x";
     public static final String INTENT_EXTRA_Y = "intent_extra_y";
+    public static final String INTENT_EXTRA_NEW_SETTING = "new_setting";
 
-    private TextView textViewResponse;
-    private ScrollView scrollView;
+    private static final int REQUEST_CODE_SETTINGS = 0;
+
     private DrawerLayout drawer;
     private View selectedTopButton;
 
@@ -185,6 +185,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            // TODO jisun - setting 화면으로 이동
+//            Intent intent = new Intent(this, SettingActivity.class);
+//            intent.putExtra(INTENT_EXTRA_NEW_SETTING, true);
+//            startActivityForResult(intent, REQUEST_CODE_SETTINGS);
             return true;
         }
 
@@ -214,6 +218,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CODE_SETTINGS:
+                if (resultCode == RESULT_OK) {
+                    // TODO jisun 변경된 지역으로 다시 api 호출하고 화면 갱신하기
+                    Toast.makeText(this, "위치 변경됨", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "위치 안 변경됨", Toast.LENGTH_SHORT).show();
+                }
+        }
     }
 }
 

@@ -39,5 +39,6 @@ dependencies {
     compile 'com.android.support:design:25.2.0'
     compile 'com.android.support:recyclerview-v7:25.2.0'
     testCompile 'junit:junit:4.12'
+    compile project(path: ':appbase')
     compile project(path: ':data')
 }
