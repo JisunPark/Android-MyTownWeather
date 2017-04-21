@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.suminjin.data.DataCode;
@@ -20,12 +21,12 @@ import java.util.ArrayList;
 public class ForecastRecyclerViewAdapter extends RecyclerView.Adapter<ForecastRecyclerViewAdapter.ViewHolder> {
 
     private Context context;
-    private ArrayList<ForecastItem> items;
+    private ArrayList<ForecastViewItem> items;
 
     // Allows to remember the last item shown on screen
     private int lastPosition = -1;
 
-    public ForecastRecyclerViewAdapter(ArrayList<ForecastItem> items, Context mContext) {
+    public ForecastRecyclerViewAdapter(ArrayList<ForecastViewItem> items, Context mContext) {
         this.items = items;
         context = mContext;
     }
@@ -45,27 +46,40 @@ public class ForecastRecyclerViewAdapter extends RecyclerView.Adapter<ForecastRe
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         int viewType = getItemViewType(position);
-        switch (getDataCode(viewType)) {
-//            case LGT:
-//                break;
-            default:
-                ForecastItem item = items.get(position);
-                holder.txtIndex.setText(String.format("[%02d]", item.index + 1));
-                holder.txtCode.setText(item.code);
-                holder.txtCodeString.setText(item.codeString);
-                holder.txtData.setText("(" + item.value + ")");
-                holder.txtDataString.setText(item.dataString);
 
-                setAnimation(holder.txtDataString, position);
+
+        switch (getDataCode(viewType)) {
+            default:
+                ForecastViewItem item = items.get(position);
+                holder.txtCode.setText("[" + item.code + "]");
+                holder.txtCodeString.setText(item.dataCode.dataName);
+
+                holder.layoutContents.removeAllViews();
+                LayoutInflater inflater = LayoutInflater.from(context);
+                for (int i = 0; i < item.list.size(); i++) {
+                    LinearLayout layoutRow = (LinearLayout) inflater.inflate(R.layout.layout_grib_item_sub, null, false);
+                    TextView txtTime = (TextView) layoutRow.findViewById(R.id.txtTime);
+                    TextView txtData = (TextView) layoutRow.findViewById(R.id.txtData);
+                    TextView txtDataString = (TextView) layoutRow.findViewById(R.id.txtDataString);
+
+                    ForecastViewSubItem subItem = item.list.get(i);
+                    if (!subItem.date.isEmpty() && !subItem.time.isEmpty()) {
+                        txtTime.setText(subItem.getFormattedDateString() +
+                                " " + subItem.getFormattedTimeString());
+                    }
+                    txtData.setText("(" + subItem.value + ")");
+                    txtDataString.setText(subItem.dataString);
+
+                    holder.layoutContents.addView(layoutRow);
+                }
+
+                setAnimation(holder.layoutContents, position);
         }
     }
 
     protected int getLayout(int viewType) {
-        int res = R.layout.layout_grib_item_default;
+        int res = R.layout.layout_grib_item;
         switch (getDataCode(viewType)) {
-//            case LGT:
-//                res = R.layout.layout_grib_item_lgt;
-//                break;
             default:
         }
         return res;
@@ -77,23 +91,17 @@ public class ForecastRecyclerViewAdapter extends RecyclerView.Adapter<ForecastRe
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView txtIndex;
         public TextView txtCode;
         public TextView txtCodeString;
-        public TextView txtData;
-        public TextView txtDataString;
+        public LinearLayout layoutContents;
 
         public ViewHolder(View view, int viewType) {
             super(view);
             switch (getDataCode(viewType)) {
-//                case LGT:
-//                    break;
                 default:
-                    txtIndex = (TextView) view.findViewById(R.id.txtIndex);
                     txtCode = (TextView) view.findViewById(R.id.txtCode);
                     txtCodeString = (TextView) view.findViewById(R.id.txtCodeString);
-                    txtData = (TextView) view.findViewById(R.id.txtData);
-                    txtDataString = (TextView) view.findViewById(R.id.txtDataString);
+                    layoutContents = (LinearLayout) view.findViewById(R.id.layoutContents);
             }
         }
     }

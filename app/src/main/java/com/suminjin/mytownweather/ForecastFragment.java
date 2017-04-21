@@ -24,24 +24,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by parkjisun on 2017. 4. 19..
  */
 
 public class ForecastFragment extends Fragment {
-    private HashMap<String, ArrayList<MapDataItem>> forecastMap = new HashMap<>();
-
-    private class MapDataItem {
-        public String time;
-        public String value;
-
-        public MapDataItem(String time, String value) {
-            this.time = time;
-            this.value = value;
-        }
-    }
+    private ArrayList<ForecastViewItem> viewList = new ArrayList<>();
 
     private RecyclerView recyclerView;
     private TextView textViewResponse;
@@ -133,7 +122,7 @@ public class ForecastFragment extends Fragment {
      */
     private String parseResponse(ApiType apiType, String responseStr) {
         StringBuilder sb = new StringBuilder();
-        forecastMap.clear();
+        viewList.clear();
 
         try {
             JSONObject jsonObject = new JSONObject(responseStr);
@@ -147,30 +136,30 @@ public class ForecastFragment extends Fragment {
                 if (totalCount != null && Integer.parseInt(totalCount) > 0) {
                     JSONObject items = body.getJSONObject(JsonField.ITEMS.name);
                     JSONArray itemArray = items.getJSONArray(JsonField.ITEM.name);
+                    Log.e("jisunLog", "itemArray size : " + itemArray.length());
 
-                    ArrayList<ForecastItem> list = new ArrayList<>();
                     for (int i = 0; i < itemArray.length(); i++) {
                         JSONObject obj = (JSONObject) itemArray.get(i);
                         String category = obj.getString(JsonField.CATEGORY.name);
                         switch (apiType) {
                             case FORECAST_GRIB:
                                 String obsrValue = obj.getString(JsonField.OBSR_VALUE.name);
-                                list.add(new ForecastItem(apiType, i, category, null, obsrValue));
+                                groupingCategory(category, null, null, obsrValue);
                                 break;
                             case FORECAST_TIME_DATA:
                             case FORECAST_SPACE_DATA:
+                                String fcstDate = obj.getString(JsonField.FCST_DATE .name);
                                 String fcstTime = obj.getString(JsonField.FCST_TIME.name);
                                 String fcstValue = obj.getString(JsonField.FCST_VALUE.name);
-                                ForecastItem item = new ForecastItem(apiType, i, category, fcstTime, fcstValue);
-//                                sb.append(item.toString());
-                                list.add(item); // FIXME jisun-temp
-                                groupingCategory(category, fcstTime, fcstValue);
+                                groupingCategory(category, fcstDate, fcstTime, fcstValue);
                                 break;
                             default:
                         }
                     }
+
+                    Log.e("jisunLog", "viewList.size : " + viewList.size());
                     // set recylcerView list
-                    recyclerView.setAdapter(new ForecastRecyclerViewAdapter(list, getActivity()));
+                    recyclerView.setAdapter(new ForecastRecyclerViewAdapter(viewList, getActivity()));
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                     recyclerView.setLayoutManager(layoutManager);
 
@@ -195,15 +184,29 @@ public class ForecastFragment extends Fragment {
      * @param time
      * @param value
      */
-    private void groupingCategory(String category, String time, String value) {
-        ArrayList<MapDataItem> data;
-        if (forecastMap.containsKey(category)) {
-            data = forecastMap.get(category);
-        } else {
-            data = new ArrayList<>();
+    private void groupingCategory(String category, String date, String time, String value) {
+        int targetIndex = -1;
+        ForecastViewItem targetItem = null;
+        for (int i = 0; i < viewList.size(); i++) {
+            ForecastViewItem item = viewList.get(i);
+            if (item.code.equals(category)) {
+                targetItem = item;
+                targetIndex = i;
+                break;
+            }
         }
-        data.add(new MapDataItem(time, value));
-        forecastMap.put(category, data);
+
+        if (targetItem == null) {
+            targetItem = new ForecastViewItem(category);
+        }
+        ArrayList<ForecastViewSubItem> list = targetItem.list;
+        list.add(new ForecastViewSubItem(apiType, category, date, time, value));
+
+        if (targetIndex >= 0) {
+            viewList.set(targetIndex, targetItem);
+        } else {
+            viewList.add(targetItem);
+        }
     }
 
 }

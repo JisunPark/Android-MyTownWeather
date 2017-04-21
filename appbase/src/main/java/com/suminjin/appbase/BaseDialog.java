@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 /**
  * Created by jspark on 2016-03-14.
@@ -29,8 +30,10 @@ public abstract class BaseDialog extends Dialog {
         getWindow().setBackgroundDrawableResource(android.R.color.transparent);
     }
 
-    public void setOnPositiveBtnClickListener(View.OnClickListener listener) {
-        findViewById(R.id.btnOk).setOnClickListener(listener);
+    public void setPositiveBtn(int resId, View.OnClickListener listener) {
+        TextView btnOk = (TextView) findViewById(R.id.btnOk);
+        btnOk.setText(resId);
+        btnOk.setOnClickListener(listener);
     }
 
     public void setOnNegativeBtnClickListener(View.OnClickListener listener) {

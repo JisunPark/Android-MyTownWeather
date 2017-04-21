@@ -33,7 +33,7 @@ public class SettingActivity extends AppCompatActivity {
                         .append("]으로 이동하시겠습니까?");
 
                 final CustomDialog msgDialog = new CustomDialog(SettingActivity.this, R.string.select_location, sb.toString());
-                msgDialog.setOnPositiveBtnClickListener(new View.OnClickListener() {
+                msgDialog.setPositiveBtn(R.string.confirm, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         msgDialog.dismiss();
@@ -76,6 +76,8 @@ public class SettingActivity extends AppCompatActivity {
         SettingConfig.put(this, SettingConfig.KEY_X, x);
         SettingConfig.put(this, SettingConfig.KEY_Y, y);
         Intent intent = new Intent();
+        intent.putExtra(MainActivity.INTENT_EXTRA_X, x);
+        intent.putExtra(MainActivity.INTENT_EXTRA_Y, y);
         setResult(RESULT_OK, intent);
         finish();
     }

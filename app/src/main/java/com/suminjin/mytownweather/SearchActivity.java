@@ -111,7 +111,7 @@ public class SearchActivity extends AppCompatActivity {
                 SettingConfig.put(this, SettingConfig.KEY_CHECKED_GPS, true);
 
                 final CustomDialog dialog = new CustomDialog(this, R.string.seacrh_current_location, R.string.gps_confirm_msg);
-                dialog.setOnPositiveBtnClickListener(new View.OnClickListener() {
+                dialog.setPositiveBtn(R.string.settings, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         //GPS 설정화면으로 이동

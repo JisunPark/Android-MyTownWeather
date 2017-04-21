@@ -83,7 +83,7 @@ public class ListDialog extends BaseDialog {
                 }
             });
 
-            setAnimation(holder.textView, position);
+//            setAnimation(holder.textView, position);
         }
 
         @Override

@@ -8,7 +8,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -17,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.suminjin.appbase.CustomDialog;
 import com.suminjin.appbase.ViewSwitchManager;
 import com.suminjin.data.ApiType;
 
@@ -112,13 +112,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 x = SettingConfig.get(this, SettingConfig.KEY_X, 0);
                 y = SettingConfig.get(this, SettingConfig.KEY_Y, 0);
                 name = SettingConfig.get(this, SettingConfig.KEY_NAME, "");
+                updateForecastFragment();
                 break;
             case SettingConfig.TYPE_SEARCH:
                 goToSearch();
                 name = getString(R.string.searching_current_location);
                 break;
             default:
-                goToSetting();
+                final CustomDialog dialog = new CustomDialog(this, "알림", "동네 위치를 설정해주세요.");
+                dialog.setPositiveBtn(R.string.confirm, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        goToSetting();
+                    }
+                });
+                dialog.show();
         }
 
         toolbar.setSubtitle(name);
@@ -241,6 +250,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
@@ -253,14 +267,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (resultCode == RESULT_OK) {
                     x = data.getIntExtra(INTENT_EXTRA_X, 0);
                     y = data.getIntExtra(INTENT_EXTRA_Y, 0);
-                    for (int i = 0; i < pagerAdapter.getCount(); i++) {
-                        ForecastFragment f = (ForecastFragment) pagerAdapter.getRegisteredFragment(i);
-                        f.setForecastData(x, y);
-                    }
-                    String name = SettingConfig.get(this, SettingConfig.KEY_NAME, "");
-                    if (!name.isEmpty()) {
-                        toolbar.setSubtitle(name);
-                    }
+                    updateForecastFragment();
                 } else {
                     toolbar.setSubtitle(R.string.failed_location_searching);
                 }
@@ -268,5 +275,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             default:
         }
     }
+
+    private void updateForecastFragment() {
+        if (pagerAdapter != null) {
+            for (int i = 0; i < pagerAdapter.getCount(); i++) {
+                ForecastFragment f = (ForecastFragment) pagerAdapter.getRegisteredFragment(i);
+                if (f != null) {
+                    f.setForecastData(x, y);
+                }
+            }
+
+            String name = SettingConfig.get(this, SettingConfig.KEY_NAME, "");
+            if (!name.isEmpty()) {
+                toolbar.setSubtitle(name);
+            }
+        }
+    }
+
 }
 

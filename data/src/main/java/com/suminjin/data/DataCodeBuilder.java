@@ -41,7 +41,7 @@ public class DataCodeBuilder {
             rainfallData.put(70, "40~69mm");
             rainfallData.put(100, "70mm 이상");
         }
-        return rainfallData.containsKey(key) ? rainfallData.get(key) : "정보 없음(code " + key + ")";
+        return rainfallData.containsKey(key) ? rainfallData.get(key) : "정보 없음";
     }
 
     private static String getSnowString(int key) {

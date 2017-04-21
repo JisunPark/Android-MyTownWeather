@@ -13,6 +13,7 @@ public enum JsonField {
     ITEM,
     CATEGORY,
     OBSR_VALUE("obsrValue"),
+    FCST_DATE("fcstDate"),
     FCST_TIME("fcstTime"),
     FCST_VALUE("fcstValue"),
     TOTAL_COUNT("totalCount"),

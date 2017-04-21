@@ -13,9 +13,9 @@ import java.util.Locale;
  * Created by parkjisun on 2017. 4. 19..
  */
 
-public class ForecastItem {
-    public int index;
+public class ForecastViewSubItem {
     public String code; // code == category
+    public String date;
     public String time;
     public String value;
 
@@ -24,9 +24,9 @@ public class ForecastItem {
     public DataCode dataCode = null; // DataCode Enum에서 해당하는 것
     public String dataString = ""; // 데이타를 사용자용으로 변환한 것
 
-    public ForecastItem(ApiType apiType, int index, String code, String time, String value) {
-        this.index = index;
+    public ForecastViewSubItem(ApiType apiType, String code, String date, String time, String value) {
         this.code = code;
+        this.date = date == null ? "" : date;
         this.time = time == null ? "" : time;
         this.value = value;
         this.codeString = code;
@@ -43,7 +43,6 @@ public class ForecastItem {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("[%02d ", index + 1));
         if (dataCode == null) {
             sb.append(code)
                     .append("(").append(getFormattedTimeString()).append(")")
@@ -55,6 +54,21 @@ public class ForecastItem {
         }
 
         return sb.toString();
+    }
+
+    public String getFormattedDateString() {
+        String result = date;
+        if (!time.isEmpty()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+            try {
+                Date d = sdf.parse(date);
+                result = sdf2.format(d);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
 
     /**
