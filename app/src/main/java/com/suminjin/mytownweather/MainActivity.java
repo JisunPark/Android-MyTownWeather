@@ -16,11 +16,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
+import com.suminjin.appbase.ViewSwitchManager;
 import com.suminjin.data.ApiType;
-
-import java.util.ArrayList;
 
 /**
  * Created by parkjisun on 2017. 4. 17..
@@ -30,42 +28,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static final String INTENT_EXTRA_X = "intent_extra_x";
     public static final String INTENT_EXTRA_Y = "intent_extra_y";
-    public static final String INTENT_EXTRA_NEW_SETTING = "new_setting";
 
     private static final int REQUEST_CODE_SETTINGS = 0;
+    private static final int REQUEST_CODE_SEARCH = 1;
 
     private DrawerLayout drawer;
-    private View selectedTopButton;
-
-    int x, y;
     private ViewPager viewPager;
+    private ForecastViewPagerAdapter pagerAdapter;
+    private Toolbar toolbar;
+
+    int x = 0, y = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        handleLocationSearchType();
 
 //        setCustomActionBar(); // FIXME jisun-test
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        // 메뉴 아이콘 숨김
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.addDrawerListener(toggle);
+//        toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        x = getIntent().getIntExtra(INTENT_EXTRA_X, 0);
-        y = getIntent().getIntExtra(INTENT_EXTRA_Y, 0);
-
-        final ArrayList<View> topButtonList = new ArrayList<>();
-        topButtonList.add(findViewById(R.id.btnForecastGrib));
-        topButtonList.add(findViewById(R.id.btnForecastTimeData));
-        topButtonList.add(findViewById(R.id.btnForecastSpaceData));
+        // top button들 처리
+        final ViewSwitchManager viewSwitchManager = new ViewSwitchManager();
+        ViewSwitchManager.OnClickViewSwitchListener onTopButtonClickListener = new ViewSwitchManager.OnClickViewSwitchListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem((Integer) v.getTag());
+            }
+        };
+        viewSwitchManager.add(0, findViewById(R.id.btnForecastGrib), onTopButtonClickListener);
+        viewSwitchManager.add(1, findViewById(R.id.btnForecastTimeData), onTopButtonClickListener);
+        viewSwitchManager.add(2, findViewById(R.id.btnForecastSpaceData), onTopButtonClickListener);
 
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -76,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onPageSelected(int position) {
-                setSelectedTopButton(topButtonList.get(position));
+                viewSwitchManager.setSelection(position);
             }
 
             @Override
@@ -84,47 +90,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         });
-        viewPager.setAdapter(new ForecastViewPagerAdapter(getSupportFragmentManager(), x, y));
+        pagerAdapter = new ForecastViewPagerAdapter(getSupportFragmentManager(), x, y);
+        viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(ApiType.MAX.ordinal());
-        onClickTopButton(findViewById(R.id.btnForecastGrib));
+
+        // 시작은 첫 번째 fragment에서
+        viewPager.setCurrentItem(0);
+        viewSwitchManager.setSelection(0);
     }
 
-
     /**
-     * 상단 버튼 처리
-     *
-     * @param v
+     * 위치 선택 방식에 따라 처리
      */
-    public void onClickTopButton(View v) {
-        switch (v.getId()) {
-            case R.id.btnForecastGrib:
-                viewPager.setCurrentItem(ApiType.FORECAST_GRIB.ordinal());
+    private void handleLocationSearchType() {
+        // 직접 위치 선택한 상태이면 저장값 불러오고, 현위치 검색이면 gps 검색 처리.
+        // 둘 다 아니면 설정 화면으로 이동한다.
+        int type = SettingConfig.get(this, SettingConfig.KEY_TYPE, -1);
+        String name = "";
+        switch (type) {
+            case SettingConfig.TYPE_SELECT:
+                x = SettingConfig.get(this, SettingConfig.KEY_X, 0);
+                y = SettingConfig.get(this, SettingConfig.KEY_Y, 0);
+                name = SettingConfig.get(this, SettingConfig.KEY_NAME, "");
                 break;
-            case R.id.btnForecastTimeData:
-                viewPager.setCurrentItem(ApiType.FORECAST_TIME_DATA.ordinal());
-                break;
-            case R.id.btnForecastSpaceData:
-                viewPager.setCurrentItem(ApiType.FORECAST_SPACE_DATA.ordinal());
+            case SettingConfig.TYPE_SEARCH:
+                goToSearch();
+                name = getString(R.string.searching_current_location);
                 break;
             default:
+                goToSetting();
         }
 
-        // 선택 버튼 상태 변경
-        setSelectedTopButton(v);
-    }
-
-    private void setSelectedTopButton(View v) {
-        if (v != null) {
-            if (selectedTopButton != null) {
-                selectedTopButton.setSelected(false);
-            }
-            selectedTopButton = v;
-            v.setSelected(true);
-        }
+        toolbar.setSubtitle(name);
     }
 
     /**
-     *
+     * 검색 상태로 이동
+     */
+    private void goToSearch() {
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_SEARCH);
+        overridePendingTransition(0, 0);
+    }
+
+    /**
+     * customize action bar
      */
     private void setCustomActionBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -150,13 +160,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBar.setCustomView(customView, p);
     }
 
+    /**
+     * a button in customized action abr
+     *
+     * @param v
+     */
     public void onClickMenu(View v) {
         drawer.openDrawer(Gravity.START);
     }
 
+    /**
+     * a button in customized action abr
+     *
+     * @param v
+     */
     public void onClickAdd(View v) {
-        // TODO jisun : search wifi-direct devices
-        Toast.makeText(this, "search wifi-direct devices", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -178,21 +196,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            // TODO jisun - setting 화면으로 이동
-//            Intent intent = new Intent(this, SettingActivity.class);
-//            intent.putExtra(INTENT_EXTRA_NEW_SETTING, true);
-//            startActivityForResult(intent, REQUEST_CODE_SETTINGS);
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                goToSetting();
+                break;
+            case R.id.action_search:
+                toolbar.setSubtitle(R.string.searching_current_location);
+                SettingConfig.put(this, SettingConfig.KEY_TYPE, SettingConfig.TYPE_SEARCH);
+                goToSearch();
+                break;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    private void goToSetting() {
+        Intent intent = new Intent(this, SettingActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_SETTINGS);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -226,11 +246,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (requestCode) {
             case REQUEST_CODE_SETTINGS:
                 if (resultCode == RESULT_OK) {
-                    // TODO jisun 변경된 지역으로 다시 api 호출하고 화면 갱신하기
-                    Toast.makeText(this, "위치 변경됨", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "위치 안 변경됨", Toast.LENGTH_SHORT).show();
+                    handleLocationSearchType();
                 }
+                break;
+            case REQUEST_CODE_SEARCH:
+                if (resultCode == RESULT_OK) {
+                    x = data.getIntExtra(INTENT_EXTRA_X, 0);
+                    y = data.getIntExtra(INTENT_EXTRA_Y, 0);
+                    for (int i = 0; i < pagerAdapter.getCount(); i++) {
+                        ForecastFragment f = (ForecastFragment) pagerAdapter.getRegisteredFragment(i);
+                        f.setForecastData(x, y);
+                    }
+                    String name = SettingConfig.get(this, SettingConfig.KEY_NAME, "");
+                    if (!name.isEmpty()) {
+                        toolbar.setSubtitle(name);
+                    }
+                } else {
+                    toolbar.setSubtitle(R.string.failed_location_searching);
+                }
+                break;
+            default:
         }
     }
 }

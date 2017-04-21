@@ -4,7 +4,7 @@ package com.suminjin.data;
  * Created by parkjisun on 2017. 4. 20..
  */
 
-public class LocationItem {
+public class LocalLocationItem {
     public static final int ADDR1 = 0;
     public static final int ADDR2 = 1;
     public static final int ADDR3 = 2;
@@ -17,6 +17,6 @@ public class LocationItem {
     public int x;
     public int y;
 
-    public LocationItem() {
+    public LocalLocationItem() {
     }
 }

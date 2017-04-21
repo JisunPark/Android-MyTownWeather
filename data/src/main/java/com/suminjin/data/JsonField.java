@@ -3,7 +3,7 @@ package com.suminjin.data;
 /**
  * Created by parkjisun on 2017. 4. 17..
  */
-public enum Field {
+public enum JsonField {
     RESPONSE,
     RESULT_CODE("resultCode"),
     RESULT_MSG("resultMsg"),
@@ -21,11 +21,11 @@ public enum Field {
 
     public String name;
 
-    Field() {
+    JsonField() {
         name = this.name().toLowerCase();
     }
 
-    Field(String name) {
+    JsonField(String name) {
         this.name = name;
     }
 }

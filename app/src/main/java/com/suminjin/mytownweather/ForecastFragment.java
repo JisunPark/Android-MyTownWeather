@@ -18,7 +18,7 @@ import com.suminjin.data.ApiType;
 import com.suminjin.data.AppConfig;
 import com.suminjin.data.DataCode;
 import com.suminjin.data.DataCodeBuilder;
-import com.suminjin.data.Field;
+import com.suminjin.data.JsonField;
 import com.suminjin.data.ServerConfig;
 import com.suminjin.data.ServerUtils;
 
@@ -39,9 +39,8 @@ import java.util.Locale;
 public class ForecastFragment extends Fragment {
 
     private TextView textViewResponse;
-    private ArrayList<ForecastItem> list = new ArrayList<>();
-    private ForecastRecyclerViewAdapter adapter;
     private View subView;
+    private ApiType apiType;
 
     public static ForecastFragment newInstance(int x, int y, int position) {
         ForecastFragment f = new ForecastFragment();
@@ -72,14 +71,15 @@ public class ForecastFragment extends Fragment {
         int y = args.getInt("y");
         int position = args.getInt("position");
 
-        ApiType apiType = ApiType.FORECAST_GRIB; // default
+        apiType = ApiType.FORECAST_GRIB; // default
         for (ApiType t : ApiType.values()) {
             if (t.ordinal() == position) {
                 apiType = t;
                 break;
             }
         }
-        setForecastData(apiType, x, y);
+
+        setForecastData(x, y);
 
         if (position == ApiType.FORECAST_GRIB.ordinal()) {
             ViewStub viewStub = (ViewStub) view.findViewById(R.id.viewstubForecastGrib);
@@ -90,31 +90,32 @@ public class ForecastFragment extends Fragment {
     /**
      * api type별로 url 구성 후 데이타 요청
      *
-     * @param apiType
+     * @param x
+     * @param y
      */
-    private void setForecastData(final ApiType apiType, int x, int y) {
-        // TODO jisun : convert_xy.c 파일을 이용해 위도, 경도에서 nx, ny값을 구해야 한다.
-        // 국회의사당역 37.528375, 126.917907  59/126
-        String url = ServerConfig.getUrl(getActivity(), apiType, x, y);
-//        String url = ServerConfig.getUrl(this, apiType, 59, 126); // FIXME jisun-test x,y
-//        Log.e("jisunLog", url);
+    public void setForecastData(int x, int y) {
+        // x, y가 0보다 커야 유효한 값
+        if (x > 0 && y > 0) {
+            String url = ServerConfig.getUrl(getActivity(), apiType, x, y);
+//            Log.e("jisunLog", url);
 
-        new AsyncTask<String, String, String>() {
+            new AsyncTask<String, String, String>() {
 
-            @Override
-            protected String doInBackground(String... params) {
-                return ServerUtils.requestHttpGet(params[0], null);
-            }
+                @Override
+                protected String doInBackground(String... params) {
+                    return ServerUtils.requestHttpGet(params[0], null);
+                }
 
-            @Override
-            protected void onPostExecute(String response) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("[").append(getString(apiType.nameResId)).append("]\n")
-                        .append(parseResponse(apiType, response));
-                textViewResponse.setText(sb.toString());
-                super.onPostExecute(response);
-            }
-        }.execute(url);
+                @Override
+                protected void onPostExecute(String response) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("[").append(getString(apiType.nameResId)).append("]\n")
+                            .append(parseResponse(apiType, response));
+                    textViewResponse.setText(sb.toString());
+                    super.onPostExecute(response);
+                }
+            }.execute(url);
+        }
     }
 
 
@@ -128,25 +129,26 @@ public class ForecastFragment extends Fragment {
 
         try {
             JSONObject jsonObject = new JSONObject(responseStr);
-            JSONObject response = jsonObject.getJSONObject(Field.RESPONSE.name);
-            JSONObject header = response.getJSONObject(Field.HEADER.name);
-            String resultCode = header.getString(Field.RESULT_CODE.name);
+            JSONObject response = jsonObject.getJSONObject(JsonField.RESPONSE.name);
+            JSONObject header = response.getJSONObject(JsonField.HEADER.name);
+            String resultCode = header.getString(JsonField.RESULT_CODE.name);
 
             if (resultCode != null && resultCode.equals(ServerConfig.VALID_RESULT_CODE)) {
-                JSONObject body = response.getJSONObject(Field.BODY.name);
-                String totalCount = body.getString(Field.TOTAL_COUNT.name);
+                JSONObject body = response.getJSONObject(JsonField.BODY.name);
+                String totalCount = body.getString(JsonField.TOTAL_COUNT.name);
                 if (totalCount != null && Integer.parseInt(totalCount) > 0) {
-                    JSONObject items = body.getJSONObject(Field.ITEMS.name);
-                    JSONArray itemArray = items.getJSONArray(Field.ITEM.name);
+                    JSONObject items = body.getJSONObject(JsonField.ITEMS.name);
+                    JSONArray itemArray = items.getJSONArray(JsonField.ITEM.name);
 
+                    ArrayList<ForecastItem> list = new ArrayList<>();
                     for (int i = 0; i < itemArray.length(); i++) {
                         JSONObject obj = (JSONObject) itemArray.get(i);
-                        String category = obj.getString(Field.CATEGORY.name);
+                        String category = obj.getString(JsonField.CATEGORY.name);
                         DataCode dataCode = getDataCode(category);
                         sb.append("[").append(Integer.toString(i + 1)).append(" ").append(category).append("] ");
                         switch (apiType) {
                             case FORECAST_GRIB:
-                                String obsrValue = obj.getString(Field.OBSR_VALUE.name);
+                                String obsrValue = obj.getString(JsonField.OBSR_VALUE.name);
                                 if (dataCode == null) {
                                     sb.append(category).append(" : ").append(obsrValue).append("\n");
                                     list.add(new ForecastItem(i, category, category, obsrValue, obsrValue));
@@ -158,8 +160,8 @@ public class ForecastFragment extends Fragment {
                                 break;
                             case FORECAST_TIME_DATA:
                             case FORECAST_SPACE_DATA:
-                                String fcstTime = getFormattedTimeString(obj.getString(Field.FCST_TIME.name));
-                                String fcstValue = obj.getString(Field.FCST_VALUE.name);
+                                String fcstTime = getFormattedTimeString(obj.getString(JsonField.FCST_TIME.name));
+                                String fcstValue = obj.getString(JsonField.FCST_VALUE.name);
                                 if (dataCode == null) {
                                     sb.append(category)
                                             .append("(").append(fcstTime).append(")")
@@ -182,7 +184,7 @@ public class ForecastFragment extends Fragment {
                     sb.append("no item");
                 }
             } else {
-                String resultMsg = header.getString(Field.RESULT_MSG.name);
+                String resultMsg = header.getString(JsonField.RESULT_MSG.name);
                 Toast.makeText(getActivity(), resultMsg, Toast.LENGTH_SHORT).show();
                 sb.append(resultMsg);
             }
@@ -225,4 +227,5 @@ public class ForecastFragment extends Fragment {
         }
         return dataCode;
     }
+
 }

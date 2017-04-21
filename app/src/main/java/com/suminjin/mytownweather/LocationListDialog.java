@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import com.suminjin.appbase.ListDialog;
 import com.suminjin.data.LocalLocation;
-import com.suminjin.data.LocationItem;
+import com.suminjin.data.LocalLocationItem;
 
 import java.util.ArrayList;
 
@@ -52,7 +52,7 @@ public class LocationListDialog extends ListDialog {
                         recyclerView.scrollTo(0, 0);
                         break;
                     case 3:
-                        LocationItem locationItem = localLocation.getLocationItem(selectedAddr1, selectedAddr2, data);
+                        LocalLocationItem locationItem = localLocation.getLocationItem(selectedAddr1, selectedAddr2, data);
                         if (onSelectListener != null) {
                             onSelectListener.onSelected(locationItem);
                         }
@@ -95,7 +95,7 @@ public class LocationListDialog extends ListDialog {
      * 지역 선택이 완료되었을 경우 호출되는 listener
      */
     public interface OnSelectListener {
-        void onSelected(LocationItem item);
+        void onSelected(LocalLocationItem item);
     }
 
 }

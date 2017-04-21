@@ -5,23 +5,18 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * Created by parkjisun on 2017. 4. 20..
  */
 
 public class LocalLocation {
-    public static ArrayList<LocationItem> items;
+    public static ArrayList<LocalLocationItem> items;
 
     public LocalLocation(Context context) {
         if (items == null) {
@@ -54,35 +49,35 @@ public class LocalLocation {
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONArray subArray = (JSONArray) jsonArray.get(i);
-                LocationItem locationItem = new LocationItem();
+                LocalLocationItem locationItem = new LocalLocationItem();
                 for (int j = 0; j < subArray.length(); j++) {
                     // 0,1,2 : address string
                     // 3,4 : x,y integer
                     switch (j) {
-                        case LocationItem.ADDR1:
+                        case LocalLocationItem.ADDR1:
                             if (subArray.get(j) instanceof String) {
                                 String s = (String) subArray.get(j);
                                 locationItem.addr1 = s;
                             }
                             break;
-                        case LocationItem.ADDR2:
+                        case LocalLocationItem.ADDR2:
                             if (subArray.get(j) instanceof String) {
                                 String s = (String) subArray.get(j);
                                 locationItem.addr2 = s;
                             }
                             break;
-                        case LocationItem.ADDR3:
+                        case LocalLocationItem.ADDR3:
                             if (subArray.get(j) instanceof String) {
                                 String s = (String) subArray.get(j);
                                 locationItem.addr3 = s;
                             }
                             break;
-                        case LocationItem.X:
+                        case LocalLocationItem.X:
                             if (subArray.get(j) instanceof Integer) {
                                 locationItem.x = (int) subArray.get(j);
                             }
                             break;
-                        case LocationItem.Y:
+                        case LocalLocationItem.Y:
                             if (subArray.get(j) instanceof Integer) {
                                 locationItem.y = (int) subArray.get(j);
                             }
@@ -124,7 +119,7 @@ public class LocalLocation {
     public ArrayList<String> getThirdAddressList(String addr1, String addr2) {
         ArrayList<String> list = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
-            LocationItem item = items.get(i);
+            LocalLocationItem item = items.get(i);
             String s1 = item.addr1;
             String s2 = item.addr2;
             String s3 = item.addr3;
@@ -135,10 +130,10 @@ public class LocalLocation {
         return list;
     }
 
-    public LocationItem getLocationItem(String addr1, String addr2, String addr3) {
-        LocationItem result = null;
+    public LocalLocationItem getLocationItem(String addr1, String addr2, String addr3) {
+        LocalLocationItem result = null;
         for (int i = 0; i < items.size(); i++) {
-            LocationItem item = items.get(i);
+            LocalLocationItem item = items.get(i);
             if (item.addr1.equals(addr1) && item.addr2.equals(addr2) && item.addr3.equals(addr3)) {
                 result = item;
                 break;
