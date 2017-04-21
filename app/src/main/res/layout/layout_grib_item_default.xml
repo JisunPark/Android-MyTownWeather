@@ -8,18 +8,21 @@
         android:id="@+id/txtIndex"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:textSize="15sp" />
 
     <TextView
         android:id="@+id/txtCode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:textSize="15sp" />
 
     <TextView
         android:id="@+id/txtCodeString"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:textColor="#00f"
         android:textSize="15sp" />
 
@@ -27,6 +30,7 @@
         android:id="@+id/txtDataString"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:textColor="#ea0"
         android:textSize="15sp" />
 

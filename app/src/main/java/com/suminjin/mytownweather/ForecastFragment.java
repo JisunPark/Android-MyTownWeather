@@ -10,14 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suminjin.data.ApiType;
 import com.suminjin.data.AppConfig;
-import com.suminjin.data.DataCode;
-import com.suminjin.data.DataCodeBuilder;
 import com.suminjin.data.JsonField;
 import com.suminjin.data.ServerConfig;
 import com.suminjin.data.ServerUtils;
@@ -26,20 +23,28 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import java.util.HashMap;
 
 /**
  * Created by parkjisun on 2017. 4. 19..
  */
 
 public class ForecastFragment extends Fragment {
+    private HashMap<String, ArrayList<MapDataItem>> forecastMap = new HashMap<>();
 
+    private class MapDataItem {
+        public String time;
+        public String value;
+
+        public MapDataItem(String time, String value) {
+            this.time = time;
+            this.value = value;
+        }
+    }
+
+    private RecyclerView recyclerView;
     private TextView textViewResponse;
-    private View subView;
     private ApiType apiType;
 
     public static ForecastFragment newInstance(int x, int y, int position) {
@@ -81,10 +86,7 @@ public class ForecastFragment extends Fragment {
 
         setForecastData(x, y);
 
-        if (position == ApiType.FORECAST_GRIB.ordinal()) {
-            ViewStub viewStub = (ViewStub) view.findViewById(R.id.viewstubForecastGrib);
-            subView = viewStub.inflate();
-        }
+        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
     }
 
     /**
@@ -109,9 +111,14 @@ public class ForecastFragment extends Fragment {
                 @Override
                 protected void onPostExecute(String response) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("[").append(getString(apiType.nameResId)).append("]\n")
-                            .append(parseResponse(apiType, response));
+                    sb.append("[").append(getString(apiType.nameResId)).append("]\n");
+
+                    String result = parseResponse(apiType, response);
+                    if (!result.isEmpty()) {
+                        sb.append(result);
+                    }
                     textViewResponse.setText(sb.toString());
+
                     super.onPostExecute(response);
                 }
             }.execute(url);
@@ -126,6 +133,7 @@ public class ForecastFragment extends Fragment {
      */
     private String parseResponse(ApiType apiType, String responseStr) {
         StringBuilder sb = new StringBuilder();
+        forecastMap.clear();
 
         try {
             JSONObject jsonObject = new JSONObject(responseStr);
@@ -144,42 +152,28 @@ public class ForecastFragment extends Fragment {
                     for (int i = 0; i < itemArray.length(); i++) {
                         JSONObject obj = (JSONObject) itemArray.get(i);
                         String category = obj.getString(JsonField.CATEGORY.name);
-                        DataCode dataCode = getDataCode(category);
-                        sb.append("[").append(Integer.toString(i + 1)).append(" ").append(category).append("] ");
                         switch (apiType) {
                             case FORECAST_GRIB:
                                 String obsrValue = obj.getString(JsonField.OBSR_VALUE.name);
-                                if (dataCode == null) {
-                                    sb.append(category).append(" : ").append(obsrValue).append("\n");
-                                    list.add(new ForecastItem(i, category, category, obsrValue, obsrValue));
-                                } else {
-                                    sb.append(dataCode.dataName).append(" : ")
-                                            .append(DataCodeBuilder.getDataValue(apiType, dataCode, obsrValue)).append("\n");
-                                    list.add(new ForecastItem(i, category, dataCode.dataName, obsrValue, DataCodeBuilder.getDataValue(apiType, dataCode, obsrValue)));
-                                }
+                                list.add(new ForecastItem(apiType, i, category, null, obsrValue));
                                 break;
                             case FORECAST_TIME_DATA:
                             case FORECAST_SPACE_DATA:
-                                String fcstTime = getFormattedTimeString(obj.getString(JsonField.FCST_TIME.name));
+                                String fcstTime = obj.getString(JsonField.FCST_TIME.name);
                                 String fcstValue = obj.getString(JsonField.FCST_VALUE.name);
-                                if (dataCode == null) {
-                                    sb.append(category)
-                                            .append("(").append(fcstTime).append(")")
-                                            .append(" : ").append(fcstValue).append("\n");
-                                } else {
-                                    sb.append(dataCode.dataName).append("(").append(fcstTime).append(")").append(" : ")
-                                            .append(DataCodeBuilder.getDataValue(apiType, dataCode, fcstValue)).append("\n");
-                                }
+                                ForecastItem item = new ForecastItem(apiType, i, category, fcstTime, fcstValue);
+//                                sb.append(item.toString());
+                                list.add(item); // FIXME jisun-temp
+                                groupingCategory(category, fcstTime, fcstValue);
                                 break;
                             default:
                         }
                     }
-                    if (subView != null) {
-                        RecyclerView recyclerView = (RecyclerView) subView.findViewById(R.id.recyclerView);
-                        recyclerView.setAdapter(new ForecastRecyclerViewAdapter(list, getActivity()));
-                        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-                        recyclerView.setLayoutManager(layoutManager);
-                    }
+                    // set recylcerView list
+                    recyclerView.setAdapter(new ForecastRecyclerViewAdapter(list, getActivity()));
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+                    recyclerView.setLayoutManager(layoutManager);
+
                 } else {
                     sb.append("no item");
                 }
@@ -195,37 +189,21 @@ public class ForecastFragment extends Fragment {
     }
 
     /**
-     * 시간
+     * 시간별로 같은 category값이 여러 개일 경우 묶음
      *
-     * @param dateStr
-     * @return
+     * @param category
+     * @param time
+     * @param value
      */
-    private String getFormattedTimeString(String dateStr) {
-        String result = dateStr;
-        SimpleDateFormat sdf = new SimpleDateFormat("HHmm", Locale.getDefault());
-        SimpleDateFormat sdf2 = new SimpleDateFormat("a hh:mm", Locale.getDefault());
-        try {
-            Date date = sdf.parse(dateStr);
-            result = sdf2.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
+    private void groupingCategory(String category, String time, String value) {
+        ArrayList<MapDataItem> data;
+        if (forecastMap.containsKey(category)) {
+            data = forecastMap.get(category);
+        } else {
+            data = new ArrayList<>();
         }
-        return result;
-    }
-
-    /**
-     * @param categoryCode
-     * @return
-     */
-    private DataCode getDataCode(String categoryCode) {
-        DataCode dataCode = null;
-        for (DataCode d : DataCode.values()) {
-            if (d.name().equalsIgnoreCase(categoryCode)) {
-                dataCode = d;
-                break;
-            }
-        }
-        return dataCode;
+        data.add(new MapDataItem(time, value));
+        forecastMap.put(category, data);
     }
 
 }
