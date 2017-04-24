@@ -60,7 +60,7 @@ public class ForecastViewSubItem {
         String result = date;
         if (!time.isEmpty()) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yy.MM.dd", Locale.getDefault());
             try {
                 Date d = sdf.parse(date);
                 result = sdf2.format(d);
@@ -80,7 +80,8 @@ public class ForecastViewSubItem {
         String result = time;
         if (!time.isEmpty()) {
             SimpleDateFormat sdf = new SimpleDateFormat("HHmm", Locale.getDefault());
-            SimpleDateFormat sdf2 = new SimpleDateFormat("a hh:mm", Locale.getDefault());
+//            SimpleDateFormat sdf2 = new SimpleDateFormat("a hh:mm", Locale.getDefault());
+            SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm", Locale.getDefault());
             try {
                 Date date = sdf.parse(time);
                 result = sdf2.format(date);

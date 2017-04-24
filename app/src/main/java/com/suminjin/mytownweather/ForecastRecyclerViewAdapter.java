@@ -73,7 +73,7 @@ public class ForecastRecyclerViewAdapter extends RecyclerView.Adapter<ForecastRe
                     holder.layoutContents.addView(layoutRow);
                 }
 
-                setAnimation(holder.layoutContents, position);
+                setAnimation(holder.layoutBase, position);
         }
     }
 
@@ -91,6 +91,7 @@ public class ForecastRecyclerViewAdapter extends RecyclerView.Adapter<ForecastRe
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        public View layoutBase;
         public TextView txtCode;
         public TextView txtCodeString;
         public LinearLayout layoutContents;
@@ -99,6 +100,7 @@ public class ForecastRecyclerViewAdapter extends RecyclerView.Adapter<ForecastRe
             super(view);
             switch (getDataCode(viewType)) {
                 default:
+                    layoutBase = view.findViewById(R.id.layoutBase);
                     txtCode = (TextView) view.findViewById(R.id.txtCode);
                     txtCodeString = (TextView) view.findViewById(R.id.txtCodeString);
                     layoutContents = (LinearLayout) view.findViewById(R.id.layoutContents);
