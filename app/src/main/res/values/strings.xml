@@ -12,5 +12,8 @@
     <string name="gps_confirm_msg">GPS가 꺼져 있습니다. 사용을 위해 설정으로 이동하시겠습니까?\n취소를 선택할 경우 네트워크만을 이용해 위치를 검색합니다.</string>
     <string name="searching_current_location">현위치 검색 중...</string>
     <string name="failed_location_searching">위치 검색 실패</string>
+    <string name="login">로그인</string>
+    <string name="sign_up">가입하기</string>
+    <string name="user_sign_up"><u>회원가입</u></string>
 
 </resources>

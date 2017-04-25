@@ -3,6 +3,8 @@ package com.suminjin.data;
 import android.content.Context;
 import android.util.Log;
 
+import com.suminjin.appbase.BaseConfig;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -89,7 +91,7 @@ public class LocalLocation {
             }
             Log.e("jisunLog", "items length " + items.size());
         } catch (JSONException e) {
-            Log.e(AppConfig.TAG, "JSONException] " + e.toString());
+            Log.e(BaseConfig.TAG, "JSONException] " + e.toString());
         }
     }
 

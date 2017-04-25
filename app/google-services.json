@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "770850430959",
+    "firebase_url": "https://my-town-weather.firebaseio.com",
+    "project_id": "my-town-weather",
+    "storage_bucket": "my-town-weather.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770850430959:android:661e76447760e2c3",
+        "android_client_info": {
+          "package_name": "com.suminjin.mytownweather"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "770850430959-mf18t62gpqrpv2nhlho8hjkmgl5a6vld.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.suminjin.mytownweather",
+            "certificate_hash": "e8a7dc1c9c13f53a7388546ed7aa0bb4534fb119"
+          }
+        },
+        {
+          "client_id": "770850430959-q26t9a4tntsk42f5dompfmiq1bo8aem8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUdIOSZM3_biLz2L--0D7GiuFnQJ8cMOQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "770850430959-q26t9a4tntsk42f5dompfmiq1bo8aem8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

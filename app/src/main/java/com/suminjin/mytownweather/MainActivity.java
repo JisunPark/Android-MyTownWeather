@@ -8,6 +8,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.suminjin.appbase.CustomDialog;
 import com.suminjin.appbase.ViewSwitchManager;
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final int REQUEST_CODE_SETTINGS = 0;
     private static final int REQUEST_CODE_SEARCH = 1;
+    private static final int REQUEST_CODE_LOGIN = 2;
 
     private DrawerLayout drawer;
     private ViewPager viewPager;
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
 
     int x = 0, y = 0;
+    private TextView txtUserName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,13 +57,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         // 메뉴 아이콘 숨김
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.addDrawerListener(toggle);
-//        toggle.syncState();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        txtUserName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.text_user);
 
         // top button들 처리
         final ViewSwitchManager viewSwitchManager = new ViewSwitchManager();
@@ -105,16 +110,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void handleLocationSearchType() {
         // 직접 위치 선택한 상태이면 저장값 불러오고, 현위치 검색이면 gps 검색 처리.
         // 둘 다 아니면 설정 화면으로 이동한다.
-        int type = SettingConfig.get(this, SettingConfig.KEY_TYPE, -1);
+        int type = AppData.get(this, AppData.KEY_LOCATION_TYPE, -1);
         String name = "";
         switch (type) {
-            case SettingConfig.TYPE_SELECT:
-                x = SettingConfig.get(this, SettingConfig.KEY_X, 0);
-                y = SettingConfig.get(this, SettingConfig.KEY_Y, 0);
-                name = SettingConfig.get(this, SettingConfig.KEY_NAME, "");
+            case AppData.LOCATION_TYPE_SELECT:
+                x = AppData.get(this, AppData.KEY_X, 0);
+                y = AppData.get(this, AppData.KEY_Y, 0);
+                name = AppData.get(this, AppData.KEY_LOCATION_NAME, "");
                 updateForecastFragment();
                 break;
-            case SettingConfig.TYPE_SEARCH:
+            case AppData.LOCATION_TYPE_SEARCH:
                 goToSearch();
                 name = getString(R.string.searching_current_location);
                 break;
@@ -186,6 +191,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onClickAdd(View v) {
     }
 
+    public void onClickLogin(View v) {
+        drawer.closeDrawer(GravityCompat.START);
+        startActivityForResult(new Intent(this, LoginActivity.class), REQUEST_CODE_LOGIN);
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -212,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.action_search:
                 toolbar.setSubtitle(R.string.searching_current_location);
-                SettingConfig.put(this, SettingConfig.KEY_TYPE, SettingConfig.TYPE_SEARCH);
+                AppData.put(this, AppData.KEY_LOCATION_TYPE, AppData.LOCATION_TYPE_SEARCH);
                 goToSearch();
                 break;
         }
@@ -272,6 +282,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     toolbar.setSubtitle(R.string.failed_location_searching);
                 }
                 break;
+            case REQUEST_CODE_LOGIN:
+                if(resultCode == RESULT_OK) {
+                    txtUserName.setText(data.getStringExtra(LoginActivity.INTENT_EXTRA_EMAIL));
+                }
             default:
         }
     }
@@ -285,12 +299,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
 
-            String name = SettingConfig.get(this, SettingConfig.KEY_NAME, "");
+            String name = AppData.get(this, AppData.KEY_LOCATION_NAME, "");
             if (!name.isEmpty()) {
                 toolbar.setSubtitle(name);
             }
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        AuthManager authManager = new AuthManager();
+        authManager.logout();
+        super.onDestroy();
+    }
 }
 

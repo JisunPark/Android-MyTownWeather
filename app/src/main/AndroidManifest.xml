@@ -27,6 +27,7 @@
         <activity
             android:name="com.suminjin.mytownweather.SearchActivity"
             android:theme="@style/AppTheme.Translucent"></activity>
+        <activity android:name="com.suminjin.mytownweather.LoginActivity"></activity>
     </application>
 
 </manifest>

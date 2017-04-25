@@ -38,8 +38,8 @@ public class SettingActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         msgDialog.dismiss();
 
-                        SettingConfig.put(SettingActivity.this, SettingConfig.KEY_NAME, item.addr1 + " " + item.addr2 + " " + item.addr3);
-                        goToMain(SettingConfig.TYPE_SELECT, item.x, item.y);
+                        AppData.put(SettingActivity.this, AppData.KEY_LOCATION_NAME, item.addr1 + " " + item.addr2 + " " + item.addr3);
+                        goToMain(AppData.LOCATION_TYPE_SELECT, item.x, item.y);
                     }
                 });
                 msgDialog.setOnNegativeBtnClickListener(new View.OnClickListener() {
@@ -61,7 +61,7 @@ public class SettingActivity extends AppCompatActivity {
      */
     public void onClickSearch(View v) {
         // 메인으로 이동해서 검색시작함
-        goToMain(SettingConfig.TYPE_SEARCH, 0, 0);
+        goToMain(AppData.LOCATION_TYPE_SEARCH, 0, 0);
     }
 
     /**
@@ -72,9 +72,9 @@ public class SettingActivity extends AppCompatActivity {
      * @param y
      */
     private void goToMain(int type, int x, int y) {
-        SettingConfig.put(this, SettingConfig.KEY_TYPE, type);
-        SettingConfig.put(this, SettingConfig.KEY_X, x);
-        SettingConfig.put(this, SettingConfig.KEY_Y, y);
+        AppData.put(this, AppData.KEY_LOCATION_TYPE, type);
+        AppData.put(this, AppData.KEY_X, x);
+        AppData.put(this, AppData.KEY_Y, y);
         Intent intent = new Intent();
         intent.putExtra(MainActivity.INTENT_EXTRA_X, x);
         intent.putExtra(MainActivity.INTENT_EXTRA_Y, y);

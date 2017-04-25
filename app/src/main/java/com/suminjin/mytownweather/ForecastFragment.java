@@ -14,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suminjin.data.ApiType;
-import com.suminjin.data.AppConfig;
+import com.suminjin.appbase.BaseConfig;
 import com.suminjin.data.JsonField;
 import com.suminjin.data.ServerConfig;
 import com.suminjin.data.ServerUtils;
@@ -172,7 +172,7 @@ public class ForecastFragment extends Fragment {
                 sb.append(resultMsg);
             }
         } catch (JSONException e) {
-            Log.e(AppConfig.TAG, "JSONException] " + e.toString());
+            Log.e(BaseConfig.TAG, "JSONException] " + e.toString());
         }
         return sb.toString();
     }

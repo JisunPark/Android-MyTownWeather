@@ -2,6 +2,8 @@ package com.suminjin.data;
 
 import android.util.Log;
 
+import com.suminjin.appbase.BaseConfig;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,7 +88,7 @@ public class ServerUtils {
             e.printStackTrace();
             response = "IOException ] " + e.toString();
         }
-        Log.e(AppConfig.TAG, response);
+        Log.e(BaseConfig.TAG, response);
 
         return response;
     }
@@ -126,17 +128,17 @@ public class ServerUtils {
                 sslContext = getTrustedSSLContext(caInput);
             }
         } catch (NoSuchAlgorithmException e) {
-            Log.e(AppConfig.TAG, "NoSuchAlgorithmException] " + e.toString());
+            Log.e(BaseConfig.TAG, "NoSuchAlgorithmException] " + e.toString());
         } catch (KeyManagementException e) {
-            Log.e(AppConfig.TAG, "KeyManagementException] " + e.toString());
+            Log.e(BaseConfig.TAG, "KeyManagementException] " + e.toString());
         } catch (CertificateException e) {
-            Log.e(AppConfig.TAG, "CertificateException] " + e.toString());
+            Log.e(BaseConfig.TAG, "CertificateException] " + e.toString());
         } catch (UnrecoverableKeyException e) {
-            Log.e(AppConfig.TAG, "UnrecoverableKeyException] " + e.toString());
+            Log.e(BaseConfig.TAG, "UnrecoverableKeyException] " + e.toString());
         } catch (KeyStoreException e) {
-            Log.e(AppConfig.TAG, "KeyStoreException] " + e.toString());
+            Log.e(BaseConfig.TAG, "KeyStoreException] " + e.toString());
         } catch (IOException e) {
-            Log.e(AppConfig.TAG, "IOException] " + e.toString());
+            Log.e(BaseConfig.TAG, "IOException] " + e.toString());
         }
         return sslContext;
     }

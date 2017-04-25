@@ -19,9 +19,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.suminjin.appbase.BaseConfig;
 import com.suminjin.appbase.CustomDialog;
 import com.suminjin.appbase.CustomProgressDialog;
-import com.suminjin.data.AppConfig;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,7 +52,7 @@ public class SearchActivity extends AppCompatActivity {
             //Gps 위치제공자에 의한 위치변화. 오차범위가 좁다.
             //Network 위치제공자에 의한 위치변화
             //Network 위치는 Gps에 비해 정확도가 많이 떨어진다.
-            Log.i(AppConfig.TAG, "위치정보 : " + provider + "\n위도 : " + longitude + "\n경도 : " + latitude
+            Log.i(BaseConfig.TAG, "위치정보 : " + provider + "\n위도 : " + longitude + "\n경도 : " + latitude
                     + "\n고도 : " + altitude + "\n정확도 : " + accuracy);
 
             // 위경도에 해당하는 주소 가져오기
@@ -63,10 +63,10 @@ public class SearchActivity extends AppCompatActivity {
                 if (null != listAddresses && listAddresses.size() > 0) {
                     addr = listAddresses.get(0).getAddressLine(0);
                 }
-                Log.i(AppConfig.TAG, "location name " + addr);
-                SettingConfig.put(SearchActivity.this, SettingConfig.KEY_NAME, addr);
+                Log.i(BaseConfig.TAG, "location name " + addr);
+                AppData.put(SearchActivity.this, AppData.KEY_LOCATION_NAME, addr);
             } catch (IOException e) {
-                Log.e(AppConfig.TAG, "IOException] " + e.toString());
+                Log.e(BaseConfig.TAG, "IOException] " + e.toString());
             }
 
             // 위경도를 x,y로 변환(공공 api 제공 룰에 따라)
@@ -104,11 +104,11 @@ public class SearchActivity extends AppCompatActivity {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             setLocationListener();
         } else {
-            boolean checkedGps = SettingConfig.get(this, SettingConfig.KEY_CHECKED_GPS, false);
+            boolean checkedGps = AppData.get(this, AppData.KEY_CHECKED_GPS, false);
             if (checkedGps) {
                 setLocationListener();
             } else {
-                SettingConfig.put(this, SettingConfig.KEY_CHECKED_GPS, true);
+                AppData.put(this, AppData.KEY_CHECKED_GPS, true);
 
                 final CustomDialog dialog = new CustomDialog(this, R.string.seacrh_current_location, R.string.gps_confirm_msg);
                 dialog.setPositiveBtn(R.string.settings, new View.OnClickListener() {

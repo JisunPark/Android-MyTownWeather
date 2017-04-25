@@ -142,9 +142,9 @@ public class ServerConfig {
 //            try {
 //                serviceKey = URLEncoder.encode(context.getString(R.string.service_key), DEFAULT_CHARSET);
 //            } catch (UnsupportedEncodingException e) {
-//                Log.d(AppConfig.TAG, "UnsupportedEncodingException] " + e.toString());
+//                Log.d(BaseConfig.TAG, "UnsupportedEncodingException] " + e.toString());
 //            }
-//            Log.e(AppConfig.TAG, "Encoded serviceKey] " + serviceKey);
+//            Log.e(BaseConfig.TAG, "Encoded serviceKey] " + serviceKey);
 
             try {
                 serviceKey = URLDecoder.decode(context.getString(R.string.service_key), DEFAULT_CHARSET);
