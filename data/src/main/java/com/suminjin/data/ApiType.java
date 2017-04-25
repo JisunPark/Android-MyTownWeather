@@ -5,9 +5,9 @@ package com.suminjin.data;
  */
 
 public enum ApiType {
+    FORECAST_SPACE_DATA(R.string.forecast_space_data, "ForecastSpaceData"),
     FORECAST_GRIB(R.string.forecast_grib, "ForecastGrib"),
     FORECAST_TIME_DATA(R.string.forecast_time_data, "ForecastTimeData"),
-    FORECAST_SPACE_DATA(R.string.forecast_space_data, "ForecastSpaceData"),
     MAX;
 
     public int nameResId;

@@ -11,6 +11,12 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/btnForecastSpaceData"
+            style="@style/TopButton"
+            android:onClick="onClickTopButton"
+            android:text="@string/forecast_space_data" />
+
+        <TextView
             android:id="@+id/btnForecastGrib"
             style="@style/TopButton"
             android:onClick="onClickTopButton"
@@ -22,11 +28,6 @@
             android:onClick="onClickTopButton"
             android:text="@string/forecast_time_data" />
 
-        <TextView
-            android:id="@+id/btnForecastSpaceData"
-            style="@style/TopButton"
-            android:onClick="onClickTopButton"
-            android:text="@string/forecast_space_data" />
     </LinearLayout>
 
     <android.support.v4.view.ViewPager

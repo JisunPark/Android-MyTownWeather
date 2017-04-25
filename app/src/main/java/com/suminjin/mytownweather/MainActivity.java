@@ -74,9 +74,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 viewPager.setCurrentItem((Integer) v.getTag());
             }
         };
-        viewSwitchManager.add(0, findViewById(R.id.btnForecastGrib), onTopButtonClickListener);
-        viewSwitchManager.add(1, findViewById(R.id.btnForecastTimeData), onTopButtonClickListener);
-        viewSwitchManager.add(2, findViewById(R.id.btnForecastSpaceData), onTopButtonClickListener);
+        viewSwitchManager.add(0, findViewById(R.id.btnForecastSpaceData), onTopButtonClickListener);
+        viewSwitchManager.add(1, findViewById(R.id.btnForecastGrib), onTopButtonClickListener);
+        viewSwitchManager.add(2, findViewById(R.id.btnForecastTimeData), onTopButtonClickListener);
 
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
             case REQUEST_CODE_LOGIN:
-                if(resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     txtUserName.setText(data.getStringExtra(LoginActivity.INTENT_EXTRA_EMAIL));
                 }
             default:

@@ -30,7 +30,7 @@ import java.util.ArrayList;
  */
 
 public class ForecastFragment extends Fragment {
-    private ArrayList<ForecastViewItem> viewList = new ArrayList<>();
+    private ArrayList<ForecastItem> viewList = new ArrayList<>();
 
     private RecyclerView recyclerView;
     private TextView textViewResponse;
@@ -186,9 +186,9 @@ public class ForecastFragment extends Fragment {
      */
     private void groupingCategory(String category, String date, String time, String value) {
         int targetIndex = -1;
-        ForecastViewItem targetItem = null;
+        ForecastItem targetItem = null;
         for (int i = 0; i < viewList.size(); i++) {
-            ForecastViewItem item = viewList.get(i);
+            ForecastItem item = viewList.get(i);
             if (item.code.equals(category)) {
                 targetItem = item;
                 targetIndex = i;
@@ -197,10 +197,10 @@ public class ForecastFragment extends Fragment {
         }
 
         if (targetItem == null) {
-            targetItem = new ForecastViewItem(category);
+            targetItem = new ForecastItem(category);
         }
-        ArrayList<ForecastViewSubItem> list = targetItem.list;
-        list.add(new ForecastViewSubItem(apiType, category, date, time, value));
+        ArrayList<ForecastSubItem> list = targetItem.list;
+        list.add(new ForecastSubItem(apiType, category, date, time, value));
 
         if (targetIndex >= 0) {
             viewList.set(targetIndex, targetItem);

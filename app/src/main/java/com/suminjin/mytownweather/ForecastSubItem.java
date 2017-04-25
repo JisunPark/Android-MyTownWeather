@@ -13,7 +13,7 @@ import java.util.Locale;
  * Created by parkjisun on 2017. 4. 19..
  */
 
-public class ForecastViewSubItem {
+public class ForecastSubItem {
     public String code; // code == category
     public String date;
     public String time;
@@ -24,7 +24,7 @@ public class ForecastViewSubItem {
     public DataCode dataCode = null; // DataCode Enum에서 해당하는 것
     public String dataString = ""; // 데이타를 사용자용으로 변환한 것
 
-    public ForecastViewSubItem(ApiType apiType, String code, String date, String time, String value) {
+    public ForecastSubItem(ApiType apiType, String code, String date, String time, String value) {
         this.code = code;
         this.date = date == null ? "" : date;
         this.time = time == null ? "" : time;
