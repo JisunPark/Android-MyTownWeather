@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final int REQUEST_CODE_SETTINGS = 0;
     private static final int REQUEST_CODE_SEARCH = 1;
-    private static final int REQUEST_CODE_LOGIN = 2;
 
     private DrawerLayout drawer;
     private ViewPager viewPager;
@@ -191,11 +190,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onClickAdd(View v) {
     }
 
-    public void onClickLogin(View v) {
-        drawer.closeDrawer(GravityCompat.START);
-        startActivityForResult(new Intent(this, LoginActivity.class), REQUEST_CODE_LOGIN);
-    }
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -282,10 +276,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     toolbar.setSubtitle(R.string.failed_location_searching);
                 }
                 break;
-            case REQUEST_CODE_LOGIN:
-                if (resultCode == RESULT_OK) {
-                    txtUserName.setText(data.getStringExtra(LoginActivity.INTENT_EXTRA_EMAIL));
-                }
             default:
         }
     }
@@ -304,13 +294,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 toolbar.setSubtitle(name);
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        AuthManager authManager = new AuthManager();
-        authManager.logout();
-        super.onDestroy();
     }
 }
 

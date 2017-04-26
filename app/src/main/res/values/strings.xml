@@ -15,5 +15,8 @@
     <string name="login">로그인</string>
     <string name="sign_up">가입하기</string>
     <string name="user_sign_up"><u>회원가입</u></string>
+    <string name="google_login">구글 ID 로그인</string>
+
+    <string name="web_client_id">770850430959-q26t9a4tntsk42f5dompfmiq1bo8aem8.apps.googleusercontent.com</string>
 
 </resources>
